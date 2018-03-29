@@ -3,7 +3,7 @@
 $db = mysqli_connect('localhost', 'root', '') or
 		die(mysqli_connect_error());
 
-$create_db = "CREATE DATABASE MYHOMEPAGE";
+$create_db = "CREATE DATABASE IF NOT EXISTS MYHOMEPAGE";
 mysqli_query($db, $create_db) or
         die (mysqli_error($db));
 
@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS todos(
     event VARCHAR(45) NOT NULL,
     due DATETIME() NOT NULL,
     detail VARCHAR(255),
-    PRIMARY KEY (event, due)
-)") or die(mysqli_error($db));
+	PRIMARY KEY (event, due)") or 
+	die(mysqli_error($db));
 
 // Todo: select values
 $allTodos = "SELECT event, due FROM todos";
