@@ -1,69 +1,80 @@
-<?php
-
-$db = mysqli_connect('localhost', 'root', '') or
-		die(mysqli_connect_error());
-
-$create_db = "CREATE DATABASE IF NOT EXISTS MYHOMEPAGE";
-mysqli_query($db, $create_db) or
-        die (mysqli_error($db));
-
-mysqli_select_db($db, 'MYHOMEPAGE') or 
-		die(mysqli_error($db));
-
-mysqli_query($db, "		
-CREATE TABLE IF NOT EXISTS todos(
-    event VARCHAR(45) NOT NULL,
-    due DATETIME() NOT NULL,
-    detail VARCHAR(255),
-	PRIMARY KEY (event, due)") or 
-	die(mysqli_error($db));
-
-// Todo: select values
-$allTodos = "SELECT event, due FROM todos";
-$result = $db->query($allTodos);
-if ($result->num_rows > 0) {
-    // output data of each row
-    while($row = $result->fetch_assoc()) {
-        echo ": " . $row["event"]. " - due: " . $row["due"]. " " . $row["detail"]. "<br>";
-    }
-}
-?>
-
+<!DOCTYPE HTML>
 <html>
 <head>
-<script>
-	function open_todo_details()
-	{
-		document.getElementById("todo_details").style.display='block';
-		document.getElementById("my_name").style.textDecoration = "underline"
-	}
-	function close_todo_details()
-	{
-		document.getElementById("todo_details").style.display='none';
-		document.getElementById("my_name").style.textDecoration = "none"
-	}
-</script>
+<meta charset="utf-8">
+<title>My Gallery</title>
+<!-- css file -->
+<link rel="stylesheet" type="text/css" href="main.css" />
+<!-- JS files -->
+<script type="text/javascript" src="jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="jquery.form.js"></script>
+<script type="text/javascript" src="upload.js"></script>
+<script type="text/javascript" src="waterfall.js"></script>
 </head>
-<body>
-	 <!--head background-->
-	<div style="position:absolute;left:0%;top:0%; height:13.2%; width:100%; z-index:-1; background:silver">   </div>
-     <!--Todo List -->
-    <div style="position:absolute;left:5%;top:15%;"> Todo List: <ul><li><span style=" color:#3B5998;" onMouseOver="open_todo_details()" onMouseOut="close_todo_details()" id="my_name">  Todo  </span> </div>
 
-	<!--text: faceback -->
-	<div style="position:absolute;left:13.5%; top:3.3%; font-size:45; font-weight:900; color:#FFFFFF; font-weight:bold;"> <font face="myFbFont">  My HomePage </font> </div>
-	<!--body background-->
-	<div style="position:absolute;left:0%;top:13.2%; height:90%; width:100%; z-index:-1; background:#E7EBF2">   </div>
-	<!--bottam background-->
-	<div style="position:absolute;left:0%;top:100%; height:5%; width:100%; z-index:-1; background:#FFFFFF">   </div>
-      
-     <!--Todo_details -->  
-    <div style="display:none;" id="todo_details">
-    <div style="position:absolute;left:20%;top:20%; height:30%; width:30%; z-index:2; background:#000; opacity:0.5; box-shadow:10px 0px 10px 1px rgb(0,0,0);">   </div>
-    <div style="position:absolute;left:20%;top:22%; z-index:3; color:#FFF;"> <h2> Due: <?php echo "sometime"; ?> </h2> </div>
-    <div style="position:absolute;left:20%;top:27%; z-index:3; color:#FFF;">  <h3>Event: <?php echo "something"; ?> </h3> </div>
-    <div style="position:absolute;left:20%;top:34%; z-index:3; color:#FFF;"> <h3> Others: <?php echo ""; ?>  </h3> </div>
+<body>
+<div id="header">
+</div>
+
+<div id="main">
+   <div class="uploadImg">
+   		<p>Only less than 10M image files are supported.</p>
+   		<div class="btn">
+            <span>Upload Image</span>
+            <input id="fileupload" type="file" name="mypic">
+        </div>
+        <div class="progress">
+    		<span class="bar"></span><span class="percent">0%</span>
+		</div>
+        <div class="files"></div>
+        <div id="showimg"></div>
+   </div>
+</div>
+
+<div class="waterfall-container">
+      <div class="waterfall-content bgcolor-3">
+		<div id="gallerycontainer">
+			<div class="box"><img src="files/4.png" alt=""></div>
+			<div class="box"><img src="files/4.png" alt=""></div>
+			<div class="box"><img src="files/4.png" alt=""></div>
+			<div class="box"><img src="files/4.png" alt=""></div>
+			<div class="box"><img src="files/4.png" alt=""></div>
+			<div class="box"><img src="files/4.png" alt=""></div>
+			<div class="box"><img src="files/4.png" alt=""></div>
+			<div class="box"><img src="files/4.png" alt=""></div>
+			<div class="box"><img src="files/4.png" alt=""></div>
+		</div>
 	</div>
-    
+</div>
+<script>
+
+var str = "";
+var str = "";
+var templ = '<div class="box" style="opacity:0;filter:alpha(opacity=0);"><div class="pic"><img src="files/{{src}}" /></div></div>'
+$(document).ready(function () {
+	$.ajax({ 
+    	type: 'GET', 
+    	url: 'loadImageName.php',
+    	dataType: 'json',
+    	success: function (data) { 
+        	$.each(data, function(index, element) {
+				str += templ.replace("{{src}}", data[index].name);
+				})
+			}
+	});
+});
+
+	$("#gallerycontainer").waterfall({
+	    itemClass: ".box",
+	    minColCount: 1,
+	    spacingHeight: 100,
+	    resizeable: false,
+	    ajaxCallback: function(success, end) {
+			$(str).appendTo($("#gallerycontainer"));
+	        success();
+	        end();
+	    }
+	});
+</script>
 </body>
 </html>
