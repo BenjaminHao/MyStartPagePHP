@@ -1,1 +1,1 @@
-PHP personal project: MyStartPage
+PHP personal project: MyGallery
